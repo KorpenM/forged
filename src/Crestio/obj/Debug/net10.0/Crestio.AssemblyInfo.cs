@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Crestio")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e2de07a625c6cc9386f5566b94c57c6c72eb11cb")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cf6817823fa564f44779e3bd9df4b3edbfb71bb9")]
 [assembly: System.Reflection.AssemblyProductAttribute("Crestio")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Crestio")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
