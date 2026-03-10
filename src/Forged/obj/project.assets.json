@@ -3121,11 +3121,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Dev\\crestio\\src\\Crestio\\Crestio.csproj",
-      "projectName": "Crestio",
-      "projectPath": "C:\\Dev\\crestio\\src\\Crestio\\Crestio.csproj",
+      "projectUniqueName": "C:\\Dev\\forged\\src\\Forged\\Forged.csproj",
+      "projectName": "Forged",
+      "projectPath": "C:\\Dev\\forged\\src\\Forged\\Forged.csproj",
       "packagesPath": "C:\\Users\\magnu\\.nuget\\packages\\",
-      "outputPath": "C:\\Dev\\crestio\\src\\Crestio\\obj\\",
+      "outputPath": "C:\\Dev\\forged\\src\\Forged\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

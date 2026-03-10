@@ -1,6 +1,7 @@
-﻿namespace Crestio.Models
+﻿namespace Forged.Models
 {
     public class ActivityDetail
     {
+
     }
 }

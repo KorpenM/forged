@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "/Fqj052AYBY=",
+  "dgSpecHash": "Fqv//75bgIc=",
   "success": true,
-  "projectFilePath": "C:\\Dev\\crestio\\src\\Crestio\\Crestio.csproj",
+  "projectFilePath": "C:\\Dev\\forged\\src\\Forged\\Forged.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\magnu\\.nuget\\packages\\azure.core\\1.47.1\\azure.core.1.47.1.nupkg.sha512",
     "C:\\Users\\magnu\\.nuget\\packages\\azure.identity\\1.14.2\\azure.identity.1.14.2.nupkg.sha512",
