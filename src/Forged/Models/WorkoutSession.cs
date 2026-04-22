@@ -24,7 +24,7 @@ namespace Forged.Models
 
         [Required]
         public DateTime Date { get; set; } = DateTime.Today;
-        public ActivityType ActivityType { get; set; } = ActivityType.Gym;
+        public ActivityType? ActivityType { get; set; } = null;
         public string Notes { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public ICollection<ActivityDetail> ActivityDetails { get; set; } = new List<ActivityDetail>();

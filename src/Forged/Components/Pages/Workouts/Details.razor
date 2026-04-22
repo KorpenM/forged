@@ -79,7 +79,7 @@ else
             <hr class="divider" />
             <div class="form-group">
                 <label class="form-label">Notes</label>
-                <p>@session.Notes</p>
+                <p style="color: var(--text-primary); white-space: pre-wrap;">@session.Notes</p>
             </div>
         }
     </div>
@@ -99,7 +99,7 @@ else
                 .ToList();
     }
 
-    private string GetBadgeClass(ActivityType t) => t switch
+    private string GetBadgeClass(ActivityType? t) => t switch
     {
         ActivityType.Gym => "badge-gym",
         ActivityType.HomeWorkout => "badge-homeworkout",

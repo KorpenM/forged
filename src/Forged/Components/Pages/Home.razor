@@ -87,7 +87,7 @@ else
         if (last != null) lastActivity = last.ActivityType.ToString();
     }
 
-    private string GetBadgeClass(ActivityType t) => t switch
+    private string GetBadgeClass(ActivityType? t) => t switch
     {
         ActivityType.Gym => "badge-gym",
         ActivityType.HomeWorkout => "badge-homeworkout",

@@ -461,3 +461,21 @@ select.form-control option {
     justify-content: space-between;
     margin-top: 16px;
 }
+
+select.form-control {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+    select.form-control option {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+    }
+
+.detail-item span {
+    color: var(--text-primary);
+}
+
+.detail-item label {
+    color: var(--text-secondary);
+}
