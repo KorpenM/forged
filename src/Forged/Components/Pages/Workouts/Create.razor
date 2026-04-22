@@ -20,6 +20,7 @@
     <div class="form-group">
         <label class="form-label">Activity Type</label>
         <select class="form-control" @bind="session.ActivityType">
+            <option value="">– Select Activity –</option>
             @foreach (var type in Enum.GetValues<ActivityType>())
             {
                 <option value="@type">@type</option>
