@@ -1,5 +1,87 @@
-﻿<h3>Index</h3>
+﻿@page "/workouts"
+@rendermode InteractiveServer
+@using Forged.Data
+@using Forged.Models
+@inject AppDbContext Db
+@inject NavigationManager Nav
+
+<PageTitle>FORGED – Workouts</PageTitle>
+
+<div class="page-header">
+    <h1>Workouts</h1>
+    <a href="/workouts/create" class="btn-primary">+ Log Workout</a>
+</div>
+
+@if (!workouts.Any())
+{
+    <div class="empty-state">
+        <p>No workouts logged yet.</p>
+        <a href="/workouts/create" class="btn-primary">Log your first workout</a>
+    </div>
+}
+else
+{
+    @foreach (var w in workouts)
+    {
+        <div class="workout-item">
+            <div class="workout-item-left">
+                <span class="badge @GetBadgeClass(w.ActivityType)">@w.ActivityType</span>
+                <span class="workout-date">@w.Date.ToString("MMM dd, yyyy")</span>
+                @if (!string.IsNullOrEmpty(w.Notes))
+                {
+                    <span class="text-muted" style="font-size:13px;">@w.Notes</span>
+                }
+            </div>
+            <div class="workout-item-right">
+                <a href="/workouts/details/@w.Id" class="btn-ghost">View</a>
+                <a href="/workouts/edit/@w.Id" class="btn-ghost">Edit</a>
+                <button class="btn-danger" @onclick="() => Delete(w.Id)">Delete</button>
+            </div>
+        </div>
+    }
+}
 
 @code {
+    private List<WorkoutSession> workouts = new();
 
+    protected override void OnInitialized()
+    {
+        LoadWorkouts();
+    }
+
+    private void LoadWorkouts()
+    {
+        workouts = Db.WorkoutSessions
+            .OrderByDescending(w => w.Date)
+            .ToList();
+    }
+
+    private void Delete(int id)
+    {
+        var w = Db.WorkoutSessions.Find(id);
+        if (w != null)
+        {
+            var details = Db.ActivityDetails
+                .Where(a => a.WorkoutSessionId == id)
+                .ToList();
+            Db.ActivityDetails.RemoveRange(details);
+            Db.WorkoutSessions.Remove(w);
+            Db.SaveChanges();
+            LoadWorkouts();
+        }
+    }
+
+    private string GetBadgeClass(ActivityType t) => t switch
+    {
+        ActivityType.Gym => "badge-gym",
+        ActivityType.HomeWorkout => "badge-homeworkout",
+        ActivityType.Calisthenics => "badge-calisthenics",
+        ActivityType.Running => "badge-running",
+        ActivityType.Cycling => "badge-cycling",
+        ActivityType.Yoga => "badge-yoga",
+        ActivityType.TeamSport => "badge-teamsport",
+        ActivityType.Tennis => "badge-tennis",
+        ActivityType.Swimming => "badge-swimming",
+        _ => "badge-other"
+    };
 }
