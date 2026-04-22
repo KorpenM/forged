@@ -179,7 +179,6 @@ C:\Dev\forged\src\Forged\obj\Debug\net10.0\scopedcss\Components\Layout\NavMenu.r
 C:\Dev\forged\src\Forged\obj\Debug\net10.0\scopedcss\Components\Layout\ReconnectModal.razor.rz.scp.css
 C:\Dev\forged\src\Forged\obj\Debug\net10.0\scopedcss\bundle\Forged.styles.css
 C:\Dev\forged\src\Forged\obj\Debug\net10.0\scopedcss\projectbundle\Forged.bundle.scp.css
-C:\Dev\forged\src\Forged\obj\Debug\net10.0\compressed\4h15irhi2b-{0}-khy4lop6wu-khy4lop6wu.gz
 C:\Dev\forged\src\Forged\obj\Debug\net10.0\compressed\35totwt26g-{0}-bqjiyaj88i-bqjiyaj88i.gz
 C:\Dev\forged\src\Forged\obj\Debug\net10.0\compressed\yujaiwdko6-{0}-c2jlpeoesf-c2jlpeoesf.gz
 C:\Dev\forged\src\Forged\obj\Debug\net10.0\compressed\3hqv4ojx6w-{0}-erw9l3u2r3-erw9l3u2r3.gz
@@ -241,3 +240,4 @@ C:\Dev\forged\src\Forged\obj\Debug\net10.0\refint\Forged.dll
 C:\Dev\forged\src\Forged\obj\Debug\net10.0\Forged.pdb
 C:\Dev\forged\src\Forged\obj\Debug\net10.0\Forged.genruntimeconfig.cache
 C:\Dev\forged\src\Forged\obj\Debug\net10.0\ref\Forged.dll
+C:\Dev\forged\src\Forged\obj\Debug\net10.0\compressed\4h15irhi2b-{0}-colycvfzwb-colycvfzwb.gz

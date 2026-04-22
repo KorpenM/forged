@@ -1,5 +1,200 @@
-﻿<h3>Create</h3>
+﻿@page "/workouts/create"
+@rendermode InteractiveServer
+@using Forged.Data
+@using Forged.Models
+@inject AppDbContext Db
+@inject NavigationManager Nav
+
+<PageTitle>FORGED – Log Workout</PageTitle>
+
+<div class="page-header">
+    <h1>Log Workout</h1>
+</div>
+
+<div class="card" style="max-width:700px;">
+    <div class="form-group">
+        <label class="form-label">Date</label>
+        <input type="date" class="form-control" @bind="session.Date" />
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">Activity Type</label>
+        <select class="form-control" @bind="session.ActivityType">
+            @foreach (var type in Enum.GetValues<ActivityType>())
+            {
+                <option value="@type">@type</option>
+            }
+        </select>
+    </div>
+
+    <hr class="divider" />
+
+    @if (session.ActivityType == ActivityType.Gym || session.ActivityType == ActivityType.HomeWorkout)
+    {
+        <div class="exercise-section">
+            <label class="form-label">Exercises</label>
+            @foreach (var ex in exercises)
+            {
+                <div class="exercise-row">
+                    <input class="form-control" placeholder="Exercise name" @bind="ex.Name" />
+                    <input class="form-control" type="number" placeholder="Sets" @bind="ex.Sets" />
+                    <input class="form-control" type="number" placeholder="Reps" @bind="ex.Reps" />
+                    <input class="form-control" type="number" placeholder="kg" @bind="ex.Weight" />
+                    <button class="btn-danger" @onclick="() => exercises.Remove(ex)">✕</button>
+                </div>
+            }
+            <button class="add-exercise-btn" @onclick="AddExercise">+ Add Exercise</button>
+        </div>
+    }
+    else if (session.ActivityType == ActivityType.Running || session.ActivityType == ActivityType.Cycling)
+    {
+        <div class="form-group">
+            <label class="form-label">Distance (km)</label>
+            <input class="form-control" type="number" step="0.1" @bind="distance" />
+        </div>
+        <div class="form-group">
+            <label class="form-label">Duration (min)</label>
+            <input class="form-control" type="number" @bind="duration" />
+        </div>
+    }
+    else if (session.ActivityType == ActivityType.Yoga)
+    {
+        <div class="form-group">
+            <label class="form-label">Duration (min)</label>
+            <input class="form-control" type="number" @bind="duration" />
+        </div>
+        <div class="form-group">
+            <label class="form-label">Style (e.g. Vinyasa, Hatha)</label>
+            <input class="form-control" @bind="style" />
+        </div>
+    }
+    else if (session.ActivityType == ActivityType.TeamSport || session.ActivityType == ActivityType.Tennis)
+    {
+        <div class="form-group">
+            <label class="form-label">Duration (min)</label>
+            <input class="form-control" type="number" @bind="duration" />
+        </div>
+        <div class="form-group">
+            <label class="form-label">Opponent (optional)</label>
+            <input class="form-control" @bind="opponent" />
+        </div>
+        <div class="form-group">
+            <label class="form-label">Result</label>
+            <select class="form-control" @bind="result">
+                <option value="">– Select –</option>
+                <option value="Win">Win</option>
+                <option value="Loss">Loss</option>
+                <option value="Draw">Draw</option>
+            </select>
+        </div>
+    }
+    else if (session.ActivityType == ActivityType.Swimming)
+    {
+        <div class="form-group">
+            <label class="form-label">Distance (m)</label>
+            <input class="form-control" type="number" @bind="distance" />
+        </div>
+        <div class="form-group">
+            <label class="form-label">Duration (min)</label>
+            <input class="form-control" type="number" @bind="duration" />
+        </div>
+    }
+    else
+    {
+        <div class="form-group">
+            <label class="form-label">Duration (min)</label>
+            <input class="form-control" type="number" @bind="duration" />
+        </div>
+    }
+
+    <hr class="divider" />
+
+    <div class="form-group">
+        <label class="form-label">Notes (optional)</label>
+        <textarea class="form-control" rows="3" @bind="session.Notes"
+                  placeholder="How did it go?"></textarea>
+    </div>
+
+    <div class="form-actions">
+        <button class="btn-primary" @onclick="Save">Save Workout</button>
+        <a href="/workouts" class="btn-secondary">Cancel</a>
+    </div>
+</div>
 
 @code {
+    private WorkoutSession session = new();
+    private List<ExerciseEntry> exercises = new() { new ExerciseEntry() };
+    private double distance;
+    private int duration;
+    private string style = "";
+    private string opponent = "";
+    private string result = "";
 
+    private void AddExercise() => exercises.Add(new ExerciseEntry());
+
+    private void Save()
+    {
+        Db.WorkoutSessions.Add(session);
+        Db.SaveChanges();
+        SaveDetails(session.Id);
+        Nav.NavigateTo("/workouts");
+    }
+
+    private void SaveDetails(int sessionId)
+    {
+        var details = new List<ActivityDetail>();
+
+        if (session.ActivityType == ActivityType.Gym ||
+            session.ActivityType == ActivityType.HomeWorkout ||
+            session.ActivityType == ActivityType.Calisthenics)
+        {
+            for (int i = 0; i < exercises.Count; i++)
+            {
+                var ex = exercises[i];
+                if (string.IsNullOrWhiteSpace(ex.Name)) continue;
+                details.Add(new ActivityDetail { WorkoutSessionId = sessionId, Key = $"exercise_{i}_name", Value = ex.Name });
+                details.Add(new ActivityDetail { WorkoutSessionId = sessionId, Key = $"exercise_{i}_sets", Value = ex.Sets.ToString() });
+                details.Add(new ActivityDetail { WorkoutSessionId = sessionId, Key = $"exercise_{i}_reps", Value = ex.Reps.ToString() });
+                details.Add(new ActivityDetail { WorkoutSessionId = sessionId, Key = $"exercise_{i}_weight", Value = ex.Weight.ToString() });
+            }
+        }
+        else if (session.ActivityType == ActivityType.Running ||
+                 session.ActivityType == ActivityType.Cycling)
+        {
+            details.Add(new ActivityDetail { WorkoutSessionId = sessionId, Key = "distance", Value = distance.ToString() });
+            details.Add(new ActivityDetail { WorkoutSessionId = sessionId, Key = "duration", Value = duration.ToString() });
+        }
+        else if (session.ActivityType == ActivityType.Yoga)
+        {
+            details.Add(new ActivityDetail { WorkoutSessionId = sessionId, Key = "duration", Value = duration.ToString() });
+            details.Add(new ActivityDetail { WorkoutSessionId = sessionId, Key = "style", Value = style });
+        }
+        else if (session.ActivityType == ActivityType.TeamSport ||
+                 session.ActivityType == ActivityType.Tennis)
+        {
+            details.Add(new ActivityDetail { WorkoutSessionId = sessionId, Key = "duration", Value = duration.ToString() });
+            details.Add(new ActivityDetail { WorkoutSessionId = sessionId, Key = "opponent", Value = opponent });
+            details.Add(new ActivityDetail { WorkoutSessionId = sessionId, Key = "result", Value = result });
+        }
+        else if (session.ActivityType == ActivityType.Swimming)
+        {
+            details.Add(new ActivityDetail { WorkoutSessionId = sessionId, Key = "distance", Value = distance.ToString() });
+            details.Add(new ActivityDetail { WorkoutSessionId = sessionId, Key = "duration", Value = duration.ToString() });
+        }
+        else
+        {
+            details.Add(new ActivityDetail { WorkoutSessionId = sessionId, Key = "duration", Value = duration.ToString() });
+        }
+
+        Db.ActivityDetails.AddRange(details);
+        Db.SaveChanges();
+    }
+
+    private class ExerciseEntry
+    {
+        public string Name { get; set; } = "";
+        public int Sets { get; set; } = 3;
+        public int Reps { get; set; } = 10;
+        public double Weight { get; set; }
+    }
 }

@@ -1,5 +1,114 @@
-﻿<h3>Details</h3>
+﻿@page "/workouts/details/{Id:int}"
+@rendermode InteractiveServer
+@using Forged.Data
+@using Forged.Models
+@inject AppDbContext Db
+@inject NavigationManager Nav
+
+<PageTitle>FORGED – Workout Details</PageTitle>
+
+@if (session == null)
+{
+    <p class="text-muted">Loading...</p>
+}
+else
+{
+    <div class="page-header">
+        <div>
+            <h1>Workout Details</h1>
+            <p class="text-muted" style="margin-top:4px;font-size:14px;">
+                @session.Date.ToString("dddd, MMMM dd yyyy")
+            </p>
+        </div>
+        <div style="display:flex;gap:10px;">
+            <a href="/workouts/edit/@session.Id" class="btn-secondary">Edit</a>
+            <a href="/workouts" class="btn-ghost">← Back</a>
+        </div>
+    </div>
+
+    <div class="card" style="max-width:700px;">
+        <div class="detail-grid">
+            <div class="detail-item">
+                <label>Activity Type</label>
+                <span class="badge @GetBadgeClass(session.ActivityType)">@session.ActivityType</span>
+            </div>
+            <div class="detail-item">
+                <label>Date</label>
+                <span>@session.Date.ToString("MMM dd, yyyy")</span>
+            </div>
+        </div>
+
+        @if (details.Any())
+        {
+            <hr class="divider" />
+
+            @if (session.ActivityType == ActivityType.Gym || 
+                 session.ActivityType == ActivityType.HomeWorkout)
+            {
+                <label class="form-label">Exercises</label>
+                @for (int i = 0; ; i++)
+                {
+                    var name = details.FirstOrDefault(d => d.Key == $"exercise_{i}_name")?.Value;
+                    if (name == null) break;
+                    var sets = details.FirstOrDefault(d => d.Key == $"exercise_{i}_sets")?.Value;
+                    var reps = details.FirstOrDefault(d => d.Key == $"exercise_{i}_reps")?.Value;
+                    var weight = details.FirstOrDefault(d => d.Key == $"exercise_{i}_weight")?.Value;
+                    <div class="workout-item" style="margin-bottom:8px;">
+                        <span style="font-weight:600;">@name</span>
+                        <span class="text-muted">@sets sets × @reps reps @weight kg</span>
+                    </div>
+                }
+
+            }
+            else
+            {
+                <div class="detail-grid">
+                    @foreach (var d in details)
+                    {
+                        <div class="detail-item">
+                            <label>@d.Key</label>
+                            <span>@d.Value</span>
+                        </div>
+                    }
+                </div>
+            }
+        }
+
+        @if (!string.IsNullOrEmpty(session.Notes))
+        {
+            <hr class="divider" />
+            <div class="form-group">
+                <label class="form-label">Notes</label>
+                <p>@session.Notes</p>
+            </div>
+        }
+    </div>
+}
 
 @code {
+    [Parameter] public int Id { get; set; }
+    private WorkoutSession? session;
+    private List<ActivityDetail> details = new();
 
+    protected override void OnInitialized()
+    {
+        session = Db.WorkoutSessions.Find(Id);
+        if (session != null)
+            details = Db.ActivityDetails
+                .Where(d => d.WorkoutSessionId == Id)
+                .ToList();
+    }
+
+    private string GetBadgeClass(ActivityType t) => t switch
+    {
+        ActivityType.Gym => "badge-gym",
+        ActivityType.HomeWorkout => "badge-homeworkout",
+        ActivityType.Running => "badge-running",
+        ActivityType.Cycling => "badge-cycling",
+        ActivityType.Yoga => "badge-yoga",
+        ActivityType.TeamSport => "badge-teamsport",
+        ActivityType.Tennis => "badge-tennis",
+        ActivityType.Swimming => "badge-swimming",
+        _ => "badge-other"
+    };
 }

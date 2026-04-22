@@ -1,7 +1,102 @@
 ﻿@page "/"
+@rendermode InteractiveServer
+@using Forged.Data
+@using Forged.Models
+@inject AppDbContext Db
 
-<PageTitle>Home</PageTitle>
+<PageTitle>FORGED – Dashboard</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="page-header">
+    <div>
+        <h1>Dashboard</h1>
+        <p style="margin-top:4px;font-size:14px;color:#aaaaaa;">
+            Welcome back, <span class="text-green">Demo User</span>
+        </p>
+    </div>
+    <a href="/workouts/create" class="btn-primary">+ Log Workout</a>
+</div>
 
-Welcome to your new app.
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-value">@totalWorkouts</div>
+        <div class="stat-label">Total Workouts</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">@thisWeek</div>
+        <div class="stat-label">This Week</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">@lastActivity</div>
+        <div class="stat-label">Last Activity</div>
+    </div>
+</div>
+
+<div class="section-header">
+    <h2>Recent Workouts</h2>
+    <a href="/workouts">View all →</a>
+</div>
+
+@if (!recentWorkouts.Any())
+{
+    <div class="empty-state">
+        <p>No workouts logged yet.</p>
+        <a href="/workouts/create" class="btn-primary">Log your first workout</a>
+    </div>
+}
+else
+{
+    @foreach (var w in recentWorkouts)
+    {
+        <div class="workout-item">
+            <div class="workout-item-left">
+                <span class="badge @GetBadgeClass(w.ActivityType)">@w.ActivityType</span>
+                <span class="workout-date">@w.Date.ToString("MMM dd, yyyy")</span>
+                @if (!string.IsNullOrEmpty(w.Notes))
+                {
+                    <span class="text-muted" style="font-size:13px;">@w.Notes</span>
+                }
+            </div>
+            <div class="workout-item-right">
+                <a href="/workouts/details/@w.Id" class="btn-ghost">View</a>
+            </div>
+        </div>
+    }
+}
+
+@code {
+    private List<WorkoutSession> recentWorkouts = new();
+    private int totalWorkouts;
+    private int thisWeek;
+    private string lastActivity = "–";
+
+    protected override void OnInitialized()
+    {
+        recentWorkouts = Db.WorkoutSessions
+            .OrderByDescending(w => w.Date)
+            .Take(5)
+            .ToList();
+
+        totalWorkouts = Db.WorkoutSessions.Count();
+
+        var weekStart = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
+        thisWeek = Db.WorkoutSessions.Count(w => w.Date >= weekStart);
+
+        var last = Db.WorkoutSessions
+            .OrderByDescending(w => w.Date)
+            .FirstOrDefault();
+        if (last != null) lastActivity = last.ActivityType.ToString();
+    }
+
+    private string GetBadgeClass(ActivityType t) => t switch
+    {
+        ActivityType.Gym => "badge-gym",
+        ActivityType.HomeWorkout => "badge-homeworkout",
+        ActivityType.Running => "badge-running",
+        ActivityType.Cycling => "badge-cycling",
+        ActivityType.Yoga => "badge-yoga",
+        ActivityType.TeamSport => "badge-teamsport",
+        ActivityType.Tennis => "badge-tennis",
+        ActivityType.Swimming => "badge-swimming",
+        _ => "badge-other"
+    };
+}
