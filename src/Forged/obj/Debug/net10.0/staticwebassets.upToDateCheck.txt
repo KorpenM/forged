@@ -1,4 +1,3 @@
-wwwroot\app.css
 wwwroot\favicon.png
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
@@ -44,10 +43,10 @@ wwwroot\lib\bootstrap\dist\js\bootstrap.js
 wwwroot\lib\bootstrap\dist\js\bootstrap.js.map
 wwwroot\lib\bootstrap\dist\js\bootstrap.min.js
 wwwroot\lib\bootstrap\dist\js\bootstrap.min.js.map
+wwwroot\app.css
 Components\Layout\ReconnectModal.razor.js
 C:\Users\magnu\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.2\build\..\_framework\blazor.web.js
 C:\Users\magnu\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.2\build\..\_framework\blazor.server.js
-C:\Dev\forged\src\Forged\wwwroot\app.css
 C:\Dev\forged\src\Forged\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
 C:\Dev\forged\src\Forged\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
 C:\Dev\forged\src\Forged\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css
@@ -95,3 +94,4 @@ C:\Dev\forged\src\Forged\wwwroot\lib\bootstrap\dist\js\bootstrap.min.js.map
 C:\Dev\forged\src\Forged\Components\Layout\ReconnectModal.razor.js
 C:\Users\magnu\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.2\_framework\blazor.web.js
 C:\Users\magnu\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.2\_framework\blazor.server.js
+C:\Dev\forged\src\Forged\wwwroot\app.css

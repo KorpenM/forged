@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Forged")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4a23cabf3059154563fa609db9f7e6d26770ee07")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ccbdcbc0d6f9f58386f9707afe2a5014c2a3e28e")]
 [assembly: System.Reflection.AssemblyProductAttribute("Forged")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Forged")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
