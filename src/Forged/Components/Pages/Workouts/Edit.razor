@@ -26,9 +26,10 @@ else
         <div class="form-group">
             <label class="form-label">Activity Type</label>
             <select class="form-control" @bind="session.ActivityType">
+                <option value="">– Select Activity –</option>
                 @foreach (var type in Enum.GetValues<ActivityType>())
                 {
-                    <option value="@type">@type</option>
+                    <option value="@type">@GetActivityName(type)</option>
                 }
             </select>
         </div>
@@ -78,4 +79,11 @@ else
             Nav.NavigateTo("/workouts");
         }
     }
+
+    private string GetActivityName(ActivityType? t) => t switch
+    {
+        ActivityType.HomeWorkout => "Home Workout",
+        ActivityType.TeamSport => "Team Sport",
+        _ => t?.ToString() ?? "Unknown"
+    };
 }

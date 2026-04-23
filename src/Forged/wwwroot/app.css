@@ -238,9 +238,13 @@ a {
     color: var(--accent);
 }
 
-.text-muted {
+/*.text-muted {
     color: var(--text-secondary);
+}*/
+.text-muted {
+    color: #aaaaaa;
 }
+
 
 .workout-item {
     background: var(--bg-card);

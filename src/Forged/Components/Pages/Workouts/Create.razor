@@ -23,14 +23,14 @@
             <option value="">– Select Activity –</option>
             @foreach (var type in Enum.GetValues<ActivityType>())
             {
-                <option value="@type">@type</option>
+                <option value="@type">@GetActivityName(type)</option>
             }
         </select>
     </div>
 
     <hr class="divider" />
 
-    @if (session.ActivityType == ActivityType.Gym || session.ActivityType == ActivityType.HomeWorkout)
+    @if (session.ActivityType == ActivityType.Gym || session.ActivityType == ActivityType.HomeWorkout || session.ActivityType == ActivityType.Calisthenics)
     {
         <div class="exercise-section">
             <label class="form-label">Exercises</label>
@@ -198,4 +198,11 @@
         public int Reps { get; set; } = 10;
         public double Weight { get; set; }
     }
+
+    private string GetActivityName(ActivityType? t) => t switch
+    {
+        ActivityType.HomeWorkout => "Home Workout",
+        ActivityType.TeamSport => "Team Sport",
+        _ => t?.ToString() ?? "Unknown"
+    };
 }

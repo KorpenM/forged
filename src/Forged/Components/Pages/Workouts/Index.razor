@@ -9,7 +9,16 @@
 
 <div class="page-header">
     <h1>Workouts</h1>
-    <a href="/workouts/create" class="btn-primary">+ Log Workout</a>
+    <div style="display:flex;gap:12px;align-items:center;">
+        <select class="form-control" style="width:180px;" @bind="filterType" @bind:after="LoadWorkouts">
+            <option value="">All Activities</option>
+            @foreach (var type in Enum.GetValues<ActivityType>())
+            {
+                <option value="@type">@GetActivityName(type)</option>
+            }
+        </select>
+        <a href="/workouts/create" class="btn-primary">+ Log Workout</a>
+    </div>
 </div>
 
 @if (!workouts.Any())
@@ -25,7 +34,7 @@ else
     {
         <div class="workout-item">
             <div class="workout-item-left">
-                <span class="badge @GetBadgeClass(w.ActivityType)">@w.ActivityType</span>
+                <span class="badge @GetBadgeClass(w.ActivityType)">@GetActivityName(w.ActivityType)</span>
                 <span class="workout-date">@w.Date.ToString("MMM dd, yyyy")</span>
                 @if (!string.IsNullOrEmpty(w.Notes))
                 {
@@ -35,7 +44,21 @@ else
             <div class="workout-item-right">
                 <a href="/workouts/details/@w.Id" class="btn-ghost">View</a>
                 <a href="/workouts/edit/@w.Id" class="btn-ghost">Edit</a>
-                <button class="btn-danger" @onclick="() => Delete(w.Id)">Delete</button>
+                <button class="btn-danger" @onclick="() => ConfirmDelete(w.Id)">Delete</button>
+            </div>
+        </div>
+    }
+
+    @if (showConfirm)
+    {
+        <div class="delete-confirm" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1000;max-width:400px;width:100%;">
+            <div>
+                <p style="color:var(--text-primary);font-weight:600;">Delete workout?</p>
+                <p class="text-muted" style="font-size:13px;">This action cannot be undone.</p>
+            </div>
+            <div style="display:flex;gap:8px;">
+                <button class="btn-danger" @onclick="DeleteConfirmed">Delete</button>
+                <button class="btn-secondary" @onclick="() => showConfirm = false">Cancel</button>
             </div>
         </div>
     }
@@ -44,17 +67,49 @@ else
 @code {
     private List<WorkoutSession> workouts = new();
 
+    private bool showConfirm = false;
+    private int deleteId;
+
+    private string filterType = "";
+
+    private void LoadWorkouts()
+    {
+        var query = Db.WorkoutSessions.AsQueryable();
+
+        if (!string.IsNullOrEmpty(filterType) &&
+            Enum.TryParse<ActivityType>(filterType, out var type))
+        {
+            query = query.Where(w => w.ActivityType == type);
+        }
+
+        workouts = query
+            .OrderByDescending(w => w.Date)
+            .ToList();
+    }
+
+    private void ConfirmDelete(int id)
+    {
+        deleteId = id;
+        showConfirm = true;
+    }
+
+    private void DeleteConfirmed()
+    {
+        Delete(deleteId);
+        showConfirm = false;
+    }
+
     protected override void OnInitialized()
     {
         LoadWorkouts();
     }
 
-    private void LoadWorkouts()
-    {
-        workouts = Db.WorkoutSessions
-            .OrderByDescending(w => w.Date)
-            .ToList();
-    }
+    // private void LoadWorkouts()
+    // {
+    //     workouts = Db.WorkoutSessions
+    //         .OrderByDescending(w => w.Date)
+    //         .ToList();
+    // }
 
     private void Delete(int id)
     {
@@ -71,6 +126,7 @@ else
         }
     }
 
+
     private string GetBadgeClass(ActivityType? t) => t switch
     {
         ActivityType.Gym => "badge-gym",
@@ -83,5 +139,12 @@ else
         ActivityType.Tennis => "badge-tennis",
         ActivityType.Swimming => "badge-swimming",
         _ => "badge-other"
+    };
+
+    private string GetActivityName(ActivityType? t) => t switch
+    {
+        ActivityType.HomeWorkout => "Home Workout",
+        ActivityType.TeamSport => "Team Sport",
+        _ => t?.ToString() ?? "Unknown"
     };
 }
