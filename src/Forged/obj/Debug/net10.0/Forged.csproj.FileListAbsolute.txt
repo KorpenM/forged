@@ -240,4 +240,4 @@ C:\Dev\forged\src\Forged\obj\Debug\net10.0\refint\Forged.dll
 C:\Dev\forged\src\Forged\obj\Debug\net10.0\Forged.pdb
 C:\Dev\forged\src\Forged\obj\Debug\net10.0\Forged.genruntimeconfig.cache
 C:\Dev\forged\src\Forged\obj\Debug\net10.0\ref\Forged.dll
-C:\Dev\forged\src\Forged\obj\Debug\net10.0\compressed\4h15irhi2b-{0}-psgh3yurr3-psgh3yurr3.gz
+C:\Dev\forged\src\Forged\obj\Debug\net10.0\compressed\4h15irhi2b-{0}-8vtpnd6b00-8vtpnd6b00.gz

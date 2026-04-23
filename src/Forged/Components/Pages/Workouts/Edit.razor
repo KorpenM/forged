@@ -26,13 +26,98 @@ else
         <div class="form-group">
             <label class="form-label">Activity Type</label>
             <select class="form-control" @bind="session.ActivityType">
-                <option value="">– Select Activity –</option>
                 @foreach (var type in Enum.GetValues<ActivityType>())
                 {
                     <option value="@type">@GetActivityName(type)</option>
                 }
             </select>
         </div>
+
+        <hr class="divider" />
+
+        @if (session.ActivityType == ActivityType.Gym ||
+                     session.ActivityType == ActivityType.HomeWorkout ||
+                     session.ActivityType == ActivityType.Calisthenics)
+        {
+            <div class="exercise-section">
+                <label class="form-label">Exercises</label>
+                @foreach (var ex in exercises)
+                {
+                    <div class="exercise-row">
+                        <input class="form-control" placeholder="Exercise name" @bind="ex.Name" />
+                        <input class="form-control" type="number" placeholder="Sets" @bind="ex.Sets" />
+                        <input class="form-control" type="number" placeholder="Reps" @bind="ex.Reps" />
+                        <input class="form-control" type="number" placeholder="kg" @bind="ex.Weight" />
+                        <button class="btn-danger" @onclick="() => exercises.Remove(ex)">✕</button>
+                    </div>
+                }
+                <button class="add-exercise-btn" @onclick="AddExercise">+ Add Exercise</button>
+            </div>
+        }
+        else if (session.ActivityType == ActivityType.Running ||
+                 session.ActivityType == ActivityType.Cycling)
+        {
+            <div class="form-group">
+                <label class="form-label">Distance (km)</label>
+                <input class="form-control" type="number" step="0.1" @bind="distance" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">Duration (min)</label>
+                <input class="form-control" type="number" @bind="duration" />
+            </div>
+        }
+        else if (session.ActivityType == ActivityType.Yoga)
+        {
+            <div class="form-group">
+                <label class="form-label">Duration (min)</label>
+                <input class="form-control" type="number" @bind="duration" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">Style (e.g. Vinyasa, Hatha)</label>
+                <input class="form-control" @bind="style" />
+            </div>
+        }
+        else if (session.ActivityType == ActivityType.TeamSport ||
+                 session.ActivityType == ActivityType.Tennis)
+        {
+            <div class="form-group">
+                <label class="form-label">Duration (min)</label>
+                <input class="form-control" type="number" @bind="duration" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">Opponent (optional)</label>
+                <input class="form-control" @bind="opponent" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">Result</label>
+                <select class="form-control" @bind="result">
+                    <option value="">– Select –</option>
+                    <option value="Win">Win</option>
+                    <option value="Loss">Loss</option>
+                    <option value="Draw">Draw</option>
+                </select>
+            </div>
+        }
+        else if (session.ActivityType == ActivityType.Swimming)
+        {
+            <div class="form-group">
+                <label class="form-label">Distance (m)</label>
+                <input class="form-control" type="number" @bind="distance" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">Duration (min)</label>
+                <input class="form-control" type="number" @bind="duration" />
+            </div>
+        }
+        else
+        {
+            <div class="form-group">
+                <label class="form-label">Duration (min)</label>
+                <input class="form-control" type="number" @bind="duration" />
+            </div>
+        }
+
+        <hr class="divider" />
 
         <div class="form-group">
             <label class="form-label">Notes</label>
@@ -54,14 +139,104 @@ else
 @code {
     [Parameter] public int Id { get; set; }
     private WorkoutSession? session;
+    private List<ActivityDetail> details = new();
+    private List<ExerciseEntry> exercises = new();
+    private double distance;
+    private int duration;
+    private string style = "";
+    private string opponent = "";
+    private string result = "";
 
     protected override void OnInitialized()
     {
         session = Db.WorkoutSessions.Find(Id);
+        if (session != null)
+        {
+            details = Db.ActivityDetails
+                .Where(d => d.WorkoutSessionId == Id)
+                .ToList();
+
+            // Ladda exercises
+            int i = 0;
+            while (true)
+            {
+                var name = details.FirstOrDefault(d => d.Key == $"exercise_{i}_name")?.Value;
+                if (name == null) break;
+                exercises.Add(new ExerciseEntry
+                {
+                    Name = name,
+                    Sets = int.TryParse(details.FirstOrDefault(d => d.Key == $"exercise_{i}_sets")?.Value, out var s) ? s : 0,
+                    Reps = int.TryParse(details.FirstOrDefault(d => d.Key == $"exercise_{i}_reps")?.Value, out var r) ? r : 0,
+                    Weight = double.TryParse(details.FirstOrDefault(d => d.Key == $"exercise_{i}_weight")?.Value, out var w) ? w : 0
+                });
+                i++;
+            }
+
+            // Ladda andra detaljer
+            distance = double.TryParse(details.FirstOrDefault(d => d.Key == "distance")?.Value, out var dist) ? dist : 0;
+            duration = int.TryParse(details.FirstOrDefault(d => d.Key == "duration")?.Value, out var dur) ? dur : 0;
+            style = details.FirstOrDefault(d => d.Key == "style")?.Value ?? "";
+            opponent = details.FirstOrDefault(d => d.Key == "opponent")?.Value ?? "";
+            result = details.FirstOrDefault(d => d.Key == "result")?.Value ?? "";
+        }
     }
+
+    private void AddExercise() => exercises.Add(new ExerciseEntry());
 
     private void Save()
     {
+        // Ta bort gamla detaljer
+        var oldDetails = Db.ActivityDetails
+            .Where(d => d.WorkoutSessionId == Id)
+            .ToList();
+        Db.ActivityDetails.RemoveRange(oldDetails);
+
+        // Spara nya detaljer
+        var newDetails = new List<ActivityDetail>();
+
+        if (session!.ActivityType == ActivityType.Gym ||
+            session.ActivityType == ActivityType.HomeWorkout ||
+            session.ActivityType == ActivityType.Calisthenics)
+        {
+            for (int i = 0; i < exercises.Count; i++)
+            {
+                var ex = exercises[i];
+                if (string.IsNullOrWhiteSpace(ex.Name)) continue;
+                newDetails.Add(new ActivityDetail { WorkoutSessionId = Id, Key = $"exercise_{i}_name", Value = ex.Name });
+                newDetails.Add(new ActivityDetail { WorkoutSessionId = Id, Key = $"exercise_{i}_sets", Value = ex.Sets.ToString() });
+                newDetails.Add(new ActivityDetail { WorkoutSessionId = Id, Key = $"exercise_{i}_reps", Value = ex.Reps.ToString() });
+                newDetails.Add(new ActivityDetail { WorkoutSessionId = Id, Key = $"exercise_{i}_weight", Value = ex.Weight.ToString() });
+            }
+        }
+        else if (session.ActivityType == ActivityType.Running ||
+                 session.ActivityType == ActivityType.Cycling)
+        {
+            newDetails.Add(new ActivityDetail { WorkoutSessionId = Id, Key = "distance", Value = distance.ToString() });
+            newDetails.Add(new ActivityDetail { WorkoutSessionId = Id, Key = "duration", Value = duration.ToString() });
+        }
+        else if (session.ActivityType == ActivityType.Yoga)
+        {
+            newDetails.Add(new ActivityDetail { WorkoutSessionId = Id, Key = "duration", Value = duration.ToString() });
+            newDetails.Add(new ActivityDetail { WorkoutSessionId = Id, Key = "style", Value = style });
+        }
+        else if (session.ActivityType == ActivityType.TeamSport ||
+                 session.ActivityType == ActivityType.Tennis)
+        {
+            newDetails.Add(new ActivityDetail { WorkoutSessionId = Id, Key = "duration", Value = duration.ToString() });
+            newDetails.Add(new ActivityDetail { WorkoutSessionId = Id, Key = "opponent", Value = opponent });
+            newDetails.Add(new ActivityDetail { WorkoutSessionId = Id, Key = "result", Value = result });
+        }
+        else if (session.ActivityType == ActivityType.Swimming)
+        {
+            newDetails.Add(new ActivityDetail { WorkoutSessionId = Id, Key = "distance", Value = distance.ToString() });
+            newDetails.Add(new ActivityDetail { WorkoutSessionId = Id, Key = "duration", Value = duration.ToString() });
+        }
+        else
+        {
+            newDetails.Add(new ActivityDetail { WorkoutSessionId = Id, Key = "duration", Value = duration.ToString() });
+        }
+
+        Db.ActivityDetails.AddRange(newDetails);
         Db.SaveChanges();
         Nav.NavigateTo($"/workouts/details/{Id}");
     }
@@ -86,4 +261,12 @@ else
         ActivityType.TeamSport => "Team Sport",
         _ => t?.ToString() ?? "Unknown"
     };
+
+    private class ExerciseEntry
+    {
+        public string Name { get; set; } = "";
+        public int Sets { get; set; } = 3;
+        public int Reps { get; set; } = 10;
+        public double Weight { get; set; }
+    }
 }
