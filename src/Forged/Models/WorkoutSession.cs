@@ -5,11 +5,13 @@ namespace Forged.Models
     public enum ActivityType
     {
         Gym,
+        [Display(Name = "Home Workout")]
         HomeWorkout,
         Calisthenics,
         Running,
         Cycling,
         Yoga,
+        [Display(Name = "Team Sport")]
         TeamSport,
         Tennis,
         Swimming,

@@ -43,10 +43,13 @@ else
             <hr class="divider" />
 
             @if (session.ActivityType == ActivityType.Gym || 
-                 session.ActivityType == ActivityType.HomeWorkout)
+                 session.ActivityType == ActivityType.HomeWorkout ||
+                 session.ActivityType == ActivityType.Calisthenics)
             {
                 <label class="form-label">Exercises</label>
-                @for (int i = 0; ; i++)
+
+
+@*                 @for (int i = 0; ; i++)
                 {
                     var name = details.FirstOrDefault(d => d.Key == $"exercise_{i}_name")?.Value;
                     if (name == null) break;
@@ -57,7 +60,15 @@ else
                         <span style="font-weight:600;">@name</span>
                         <span class="text-muted">@sets sets × @reps reps @weight kg</span>
                     </div>
-                }
+                } *@
+
+                @foreach (var ex in exercises)
+{
+    <div class="workout-item" style="margin-bottom:8px;">
+        <span style="font-weight:600; color:var(--text-primary);">@ex.Name</span>
+        <span style="color: #cccccc;">@ex.Sets sets × @ex.Reps reps @ex.Weight kg</span>
+    </div>
+}
 
             }
             else
@@ -90,14 +101,50 @@ else
     private WorkoutSession? session;
     private List<ActivityDetail> details = new();
 
+    private List<ExerciseRow> exercises = new();
+
     protected override void OnInitialized()
     {
         session = Db.WorkoutSessions.Find(Id);
         if (session != null)
+        {
             details = Db.ActivityDetails
                 .Where(d => d.WorkoutSessionId == Id)
                 .ToList();
+
+            int i = 0;
+            while (true)
+            {
+                var name = details.FirstOrDefault(d => d.Key == $"exercise_{i}_name")?.Value;
+                if (name == null) break;
+                exercises.Add(new ExerciseRow
+                {
+                    Name = name,
+                    Sets = details.FirstOrDefault(d => d.Key == $"exercise_{i}_sets")?.Value ?? "",
+                    Reps = details.FirstOrDefault(d => d.Key == $"exercise_{i}_reps")?.Value ?? "",
+                    Weight = details.FirstOrDefault(d => d.Key == $"exercise_{i}_weight")?.Value ?? ""
+                });
+                i++;
+            }
+        }
     }
+
+    private class ExerciseRow
+    {
+        public string Name { get; set; } = "";
+        public string Sets { get; set; } = "";
+        public string Reps { get; set; } = "";
+        public string Weight { get; set; } = "";
+    }
+
+    // protected override void OnInitialized()
+    // {
+    //     session = Db.WorkoutSessions.Find(Id);
+    //     if (session != null)
+    //         details = Db.ActivityDetails
+    //             .Where(d => d.WorkoutSessionId == Id)
+    //             .ToList();
+    // }
 
     private string GetBadgeClass(ActivityType? t) => t switch
     {
@@ -110,5 +157,12 @@ else
         ActivityType.Tennis => "badge-tennis",
         ActivityType.Swimming => "badge-swimming",
         _ => "badge-other"
+    };
+
+    private string GetActivityName(ActivityType? t) => t switch
+    {
+        ActivityType.HomeWorkout => "Home Workout",
+        ActivityType.TeamSport => "Team Sport",
+        _ => t?.ToString() ?? "Unknown"
     };
 }

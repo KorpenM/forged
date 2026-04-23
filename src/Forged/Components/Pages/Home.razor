@@ -49,7 +49,7 @@ else
     {
         <div class="workout-item">
             <div class="workout-item-left">
-                <span class="badge @GetBadgeClass(w.ActivityType)">@w.ActivityType</span>
+                <span class="badge @GetBadgeClass(w.ActivityType)">@GetActivityName(w.ActivityType)</span>
                 <span class="workout-date">@w.Date.ToString("MMM dd, yyyy")</span>
                 @if (!string.IsNullOrEmpty(w.Notes))
                 {
@@ -98,5 +98,12 @@ else
         ActivityType.Tennis => "badge-tennis",
         ActivityType.Swimming => "badge-swimming",
         _ => "badge-other"
+    };
+
+    private string GetActivityName(ActivityType? t) => t switch
+    {
+        ActivityType.HomeWorkout => "Home Workout",
+        ActivityType.TeamSport => "Team Sport",
+        _ => t?.ToString() ?? "Unknown"
     };
 }
