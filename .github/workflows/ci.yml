@@ -1,0 +1,29 @@
+name: CI – Build & Test
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout kod
+        uses: actions/checkout@v4
+
+      - name: Sätt upp .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Återställ beroenden
+        run: dotnet restore src/Forged/Forged.csproj
+
+      - name: Bygg applikationen
+        run: dotnet build src/Forged/Forged.csproj --no-restore --configuration Release
+
+      - name: Bygg Docker-image
+        run: docker build -t forged:latest src/Forged/
